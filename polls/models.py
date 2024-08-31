@@ -11,7 +11,8 @@ class Question(models.Model):
     Will contain different elements inside depends on the question type.
     """
     question_text = models.CharField(max_length=200)
-    pub_date = models.DateTimeField('date published')
+    pub_date = models.DateTimeField(verbose_name='date published', default=timezone.now)
+    end_date = models.DateTimeField(verbose_name='ended date', blank=True, null=True)
 
     def __str__(self):
         return self.question_text
