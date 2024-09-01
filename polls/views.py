@@ -1,9 +1,10 @@
 from django.db.models import F
 from django.http import HttpResponseRedirect
-from django.shortcuts import get_object_or_404, render
+from django.shortcuts import get_object_or_404, render, redirect
 from django.urls import reverse
 from django.views import generic
 from django.utils import timezone
+from django.contrib import messages
 
 from .models import Choice, Question
 
@@ -29,6 +30,20 @@ class DetailView(generic.DetailView):
         Excludes any questions that aren't published yet.
         """
         return Question.objects.filter(pub_date__lte=timezone.now())
+
+    @staticmethod
+    def render(request, pk, *args, **kwargs):
+        try:
+            question = Question.objects.get(pk=pk)
+        except Question.DoesNotExist:
+            messages.error(request, 'The poll does not exist.')
+            return redirect('polls:index')
+        else:
+            if question.can_vote():
+                return render(request, "polls/detail.html",
+                              {"question": question})
+            messages.error(request, 'Voting is not available for the poll.')
+            return redirect('polls:index')
 
 
 class ResultsView(generic.DetailView):
@@ -62,4 +77,5 @@ def vote(request, question_id):
         # Always return an HttpResponseRedirect after successfully dealing
         # with POST data. This prevents data from being posted twice if a
         # user hits the Back button.
-        return HttpResponseRedirect(reverse("polls:results", args=(question.id,)))
+        return HttpResponseRedirect(reverse("polls:results",
+                                            args=(question.id,)))
