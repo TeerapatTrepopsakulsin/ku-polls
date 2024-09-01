@@ -11,8 +11,10 @@ class Question(models.Model):
     Will contain different elements inside depends on the question type.
     """
     question_text = models.CharField(max_length=200)
-    pub_date = models.DateTimeField(verbose_name='date published', default=timezone.now)
-    end_date = models.DateTimeField(verbose_name='ended date', blank=True, null=True)
+    pub_date = models.DateTimeField(verbose_name='date published',
+                                    default=timezone.now)
+    end_date = models.DateTimeField(verbose_name='ended date',
+                                    blank=True, null=True)
 
     def __str__(self):
         return self.question_text
@@ -27,7 +29,8 @@ class Question(models.Model):
 
     def is_published(self):
         """
-        Check whether the current date-time is on or after question’s publication date.
+        Check whether the current date-time is on or after
+        question’s publication date.
         :return: bool
         """
         now = timezone.now()
@@ -36,7 +39,8 @@ class Question(models.Model):
     def can_vote(self):
         """
         Check whether the voting is allowed for this specific question.
-        Voting is available when the current time is between the pub_date and end_date.
+        Voting is available when the current time
+        is between the pub_date and end_date.
         If end_date is None, then can vote anytime after published.
         :return: bool
         """

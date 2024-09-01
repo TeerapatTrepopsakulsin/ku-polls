@@ -40,7 +40,8 @@ class DetailView(generic.DetailView):
             return redirect('polls:index')
         else:
             if question.can_vote():
-                return render(request, "polls/detail.html", {"question": question})
+                return render(request, "polls/detail.html",
+                              {"question": question})
             messages.error(request, 'Voting is not available for the poll.')
             return redirect('polls:index')
 
@@ -76,4 +77,5 @@ def vote(request, question_id):
         # Always return an HttpResponseRedirect after successfully dealing
         # with POST data. This prevents data from being posted twice if a
         # user hits the Back button.
-        return HttpResponseRedirect(reverse("polls:results", args=(question.id,)))
+        return HttpResponseRedirect(reverse("polls:results",
+                                            args=(question.id,)))
