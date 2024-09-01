@@ -13,6 +13,9 @@
             {% else %}
                 Closed
             {% endif %}
+            <a href="{% url 'polls:results' question.id %}">
+                <button class="button">See Result</button>
+            </a>
         </li>
     {% endfor %}
     </ul>
