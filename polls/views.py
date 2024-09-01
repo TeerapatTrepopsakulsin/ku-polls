@@ -1,9 +1,10 @@
 from django.db.models import F
 from django.http import HttpResponseRedirect
-from django.shortcuts import get_object_or_404, render
+from django.shortcuts import get_object_or_404, render, redirect
 from django.urls import reverse
 from django.views import generic
 from django.utils import timezone
+from django.contrib import messages
 
 from .models import Choice, Question
 
@@ -17,7 +18,7 @@ class IndexView(generic.ListView):
         Return the last five published questions (not including those set to be
         published in the future).
         """
-        return Question.objects.filter(pub_date__lte=timezone.now()).order_by("-pub_date")[:5]
+        return Question.objects.filter().order_by("-pub_date")[:5]
 
 
 class DetailView(generic.DetailView):
@@ -29,6 +30,19 @@ class DetailView(generic.DetailView):
         Excludes any questions that aren't published yet.
         """
         return Question.objects.filter(pub_date__lte=timezone.now())
+
+    @staticmethod
+    def render(request, pk, *args, **kwargs):
+        try:
+            question = Question.objects.get(pk=pk)
+        except Question.DoesNotExist:
+            messages.error(request, 'The poll does not exist.')
+            return redirect('polls:index')
+        else:
+            if question.can_vote():
+                return render(request, "polls/detail.html", {"question": question})
+            messages.error(request, 'Voting is not available for the poll.')
+            return redirect('polls:index')
 
 
 class ResultsView(generic.DetailView):
