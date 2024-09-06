@@ -7,7 +7,7 @@ from django.utils import timezone
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 
-from .models import Choice, Question
+from .models import Choice, Question, Vote
 
 
 class IndexView(generic.ListView):
@@ -23,6 +23,7 @@ class IndexView(generic.ListView):
 
 
 class DetailView(generic.DetailView):
+    """Display the choices of the polls to vote."""
     model = Question
     template_name = "polls/detail.html"
 
@@ -61,6 +62,7 @@ class ResultsView(generic.DetailView):
 @login_required
 def vote(request, question_id):
     question = get_object_or_404(Question, pk=question_id)
+
     try:
         selected_choice = question.choice_set.get(pk=request.POST["choice"])
     except (KeyError, Choice.DoesNotExist):
@@ -73,11 +75,22 @@ def vote(request, question_id):
                 "error_message": "You didn't select a choice.",
             },
         )
-    else:
-        selected_choice.votes = F("votes") + 1
-        selected_choice.save()
-        # Always return an HttpResponseRedirect after successfully dealing
-        # with POST data. This prevents data from being posted twice if a
-        # user hits the Back button.
-        return HttpResponseRedirect(reverse("polls:results",
-                                            args=(question.id,)))
+
+    current_user = request.user
+
+    try:
+        vote = Vote.objects.get(user=current_user, choice__question=question)
+        # vote = current_user.vote_set.get(choice__question=question)
+        # user have vote for this questuion
+        vote.choice = selected_choice
+        vote.save()
+        messages.success(request=request, message=f"Your vote are now '{selected_choice.choice_text}'")
+    except Vote.DoesNotExist:
+        vote = Vote.objects.create(user=current_user, choice=selected_choice)
+        messages.success(request=request, message=f"Your vote are now '{selected_choice.choice_text}'")
+
+    # Always return an HttpResponseRedirect after successfully dealing
+    # with POST data. This prevents data from being posted twice if a
+    # user hits the Back button.
+    return HttpResponseRedirect(reverse("polls:results",
+                                        args=(question.id,)))
