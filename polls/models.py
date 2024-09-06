@@ -3,6 +3,7 @@ import datetime
 
 from django.db import models
 from django.utils import timezone
+from django.contrib.auth.models import User
 
 
 class Question(models.Model):
@@ -55,9 +56,25 @@ class Choice(models.Model):
     A class used to represent an individual choice in the polls question.
     Mostly used for a multiple choices polls question.
     """
+
     question = models.ForeignKey(Question, on_delete=models.CASCADE)
     choice_text = models.CharField(max_length=200)
-    votes = models.IntegerField(default=0)
+
+    @property
+    def votes(self) -> int:
+        """Return the total number of votes for a choice."""
+        return self.vote_set.count()
 
     def __str__(self):
         return self.choice_text
+
+
+class Vote(models.Model):
+    """A vote by a user for a choice in a poll."""
+
+    choice = models.ForeignKey(Choice, on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    vote_text = models.CharField(max_length=200)
+
+    def __str__(self):
+        return self.vote_text
