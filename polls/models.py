@@ -74,7 +74,6 @@ class Vote(models.Model):
 
     choice = models.ForeignKey(Choice, on_delete=models.CASCADE)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
-    vote_text = models.CharField(max_length=200)
 
     def __str__(self):
-        return self.vote_text
+        return f"Vote: {self.user} -> {self.choice}"
