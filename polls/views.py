@@ -40,12 +40,18 @@ class DetailView(generic.DetailView):
         except Question.DoesNotExist:
             messages.error(request, 'The poll does not exist.')
             return redirect('polls:index')
-        else:
-            if question.can_vote():
+        if question.can_vote():
+            try:
+                current_user = request.user
+                vote = Vote.objects.get(user=current_user, choice__question=question)
+            except Vote.DoesNotExist:
+                pass
+            else:
+                messages.info(request=request, message=f"Your current choice is '{vote.choice}'")
                 return render(request, "polls/detail.html",
                               {"question": question})
-            messages.error(request, 'Voting is not available for the poll.')
-            return redirect('polls:index')
+        messages.error(request, 'Voting is not available for the poll.')
+        return redirect('polls:index')
 
 
 class ResultsView(generic.DetailView):
