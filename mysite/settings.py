@@ -111,6 +111,36 @@ AUTHENTICATION_BACKENDS = [
 LOGIN_REDIRECT_URL = 'polls:index'  # after login, show list of polls
 LOGOUT_REDIRECT_URL = 'login'       # after logout, return to login page
 
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    "formatters": {
+        "verbose": {
+            "format": "[{asctime}] {levelname}: {message}",
+            "style": "{",
+        },
+        "simple": {
+            "format": "{levelname} {message}",
+            "style": "{",
+        },
+    },
+    "handlers": {
+        "console": {
+            'class': 'logging.StreamHandler',
+            "level": "DEBUG",
+            "formatter": "verbose",
+        },
+    },
+    "loggers": {
+        "": {
+            "level": "DEBUG",
+            "handlers": ["console"],
+            "polls": {...},
+            "polls.views": {...},
+        },
+    },
+}
+
 # Internationalization
 # https://docs.djangoproject.com/en/5.1/topics/i18n/
 

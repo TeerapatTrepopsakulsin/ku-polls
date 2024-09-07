@@ -6,8 +6,51 @@ from django.views import generic
 from django.utils import timezone
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth.signals import user_logged_in, user_logged_out, user_login_failed
+from django.dispatch import receiver
 
 from .models import Choice, Question, Vote
+
+import logging
+
+logger = logging.getLogger(__name__)
+
+
+def get_client_ip(request):
+    """Get the visitor’s IP address using request headers."""
+    x_forwarded_for = request.META.get('HTTP_X_FORWARDED_FOR')
+    if x_forwarded_for:
+        ip = x_forwarded_for.split(',')[0]
+    else:
+        ip = request.META.get('REMOTE_ADDR')
+    return ip
+
+
+@receiver(user_logged_in)
+def user_logged_in_callback(sender, request, user, **kwargs):
+    ip = request.META.get('REMOTE_ADDR')
+
+    logger.info('login user: {user} via ip: {ip}'.format(
+        user=user,
+        ip=ip
+    ))
+
+
+@receiver(user_logged_out)
+def user_logged_out_callback(sender, request, user, **kwargs):
+    ip = request.META.get('REMOTE_ADDR')
+
+    logger.info('logout user: {user} via ip: {ip}'.format(
+        user=user,
+        ip=ip
+    ))
+
+
+@receiver(user_login_failed)
+def user_login_failed_callback(sender, credentials, **kwargs):
+    logger.warning('login failed for: {credentials}'.format(
+        credentials=credentials,
+    ))
 
 
 class IndexView(generic.ListView):
@@ -48,6 +91,7 @@ class DetailView(generic.DetailView):
                 pass
             else:
                 messages.info(request=request, message=f"Your current choice is '{vote.choice}'")
+            finally:
                 return render(request, "polls/detail.html",
                               {"question": question})
         messages.error(request, 'Voting is not available for the poll.')
@@ -92,5 +136,6 @@ def vote(request, question_id):
     # Always return an HttpResponseRedirect after successfully dealing
     # with POST data. This prevents data from being posted twice if a
     # user hits the Back button.
+    logger.info(f'user:{current_user.username} vote for choice:{selected_choice.id} in question:{selected_choice.question.id}')
     return HttpResponseRedirect(reverse("polls:results",
                                         args=(question.id,)))
