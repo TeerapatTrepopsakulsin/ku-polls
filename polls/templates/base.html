@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html>
+{% load static %}
+<link rel="stylesheet" href="{% static 'polls/style.css' %}">
+    <head>
+        <title>KU Polls</title>
+    </head>
+    {% if user.is_authenticated %}
+    Hi! {{user.username}}.
+    <form action="{% url 'logout' %}" method="post">
+        {% csrf_token %}
+        <button type="submit">Log Out</button>
+    </form>
+    {% else %}
+    You haven't logged in. <a href="{% url 'login'%}?next={{request.path}}">Login</a> here
+    {% endif %}
+    <body>
+    {% block content %}{% endblock content %}
+    </body>
+</html>
