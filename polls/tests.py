@@ -1,10 +1,13 @@
 import datetime
+import time
 
 from django.test import TestCase
 from django.utils import timezone
 from django.urls import reverse
-#
-# from .models import Question
+from django.contrib.auth.models import User
+from mysite import settings
+
+from .models import Question, Choice, Vote
 
 
 class QuestionModelTests(TestCase):
@@ -95,26 +98,23 @@ class QuestionModelTests(TestCase):
         self.assertIs(at_end_date_question.can_vote(), True)
 
 
-def create_question(question_text, days):
-    """
-    Create a question with the given `question_text` and published the
-    given number of `days` offset to now (negative for questions published
-    in the past, positive for questions that have yet to be published).
-    """
-    time = timezone.now() + datetime.timedelta(days=days)
-    return Question.objects.create(question_text=question_text, pub_date=time)
-
-
-def create_question_with_end_date(question_text, pub_days, end_days):
+def create_question(question_text, pub_days=0, end_days=None, num_choice=0):
     """
     Create a question with the given `question_text`, published the
     given number of `pub_days`, and ended the
     given number of `end_days` offset to now (negative for questions published
     in the past, positive for questions that have yet to be published).
+    The question contains `num_choice` amount of choices.
     """
     pub_time = timezone.now() + datetime.timedelta(days=pub_days)
-    end_time = timezone.now() + datetime.timedelta(days=end_days)
-    return Question.objects.create(question_text=question_text, pub_date=pub_time, end_date=end_time)
+    try:
+        end_time = timezone.now() + datetime.timedelta(days=end_days)
+    except TypeError:
+        end_time = None
+    question = Question.objects.create(question_text=question_text, pub_date=pub_time, end_date=end_time)
+    for i in range(num_choice):
+        question.choice_set.create(choice_text=str(i))
+    return question
 
 
 class QuestionIndexViewTests(TestCase):
@@ -132,7 +132,7 @@ class QuestionIndexViewTests(TestCase):
         Questions with a pub_date in the past are displayed on the
         index page.
         """
-        question = create_question(question_text="Past question.", days=-30)
+        question = create_question(question_text="Past question.", pub_days=-30)
         response = self.client.get(reverse("polls:index"))
         self.assertQuerySetEqual(
             response.context["latest_question_list"],
@@ -144,7 +144,7 @@ class QuestionIndexViewTests(TestCase):
         Questions with a pub_date in the future aren't displayed on
         the index page.
         """
-        create_question(question_text="Future question.", days=30)
+        create_question(question_text="Future question.", pub_days=30)
         response = self.client.get(reverse("polls:index"))
         self.assertContains(response, "No polls are available.")
         self.assertQuerySetEqual(response.context["latest_question_list"], [])
@@ -154,8 +154,8 @@ class QuestionIndexViewTests(TestCase):
         Even if both past and future questions exist, only past questions
         are displayed.
         """
-        question = create_question(question_text="Past question.", days=-30)
-        create_question(question_text="Future question.", days=30)
+        question = create_question(question_text="Past question.", pub_days=-30)
+        create_question(question_text="Future question.", pub_days=30)
         response = self.client.get(reverse("polls:index"))
         self.assertQuerySetEqual(
             response.context["latest_question_list"],
@@ -166,8 +166,8 @@ class QuestionIndexViewTests(TestCase):
         """
         The questions index page may display multiple questions.
         """
-        question1 = create_question(question_text="Past question 1.", days=-30)
-        question2 = create_question(question_text="Past question 2.", days=-5)
+        question1 = create_question(question_text="Past question 1.", pub_days=-30)
+        question2 = create_question(question_text="Past question 2.", pub_days=-5)
         response = self.client.get(reverse("polls:index"))
         self.assertQuerySetEqual(
             response.context["latest_question_list"],
@@ -181,7 +181,7 @@ class QuestionDetailViewTests(TestCase):
         The detail view of a question with a pub_date in the future
         should redirect to polls index page.
         """
-        future_question = create_question(question_text="Future question.", days=5)
+        future_question = create_question(question_text="Future question.", pub_days=5)
         url = reverse("polls:detail", args=(future_question.id,))
         response = self.client.get(url)
         self.assertRedirects(response, reverse("polls:index"))
@@ -191,7 +191,7 @@ class QuestionDetailViewTests(TestCase):
         The detail view of a question with a pub_date in the past
         displays the question's text.
         """
-        past_question = create_question(question_text="Past Question.", days=-5)
+        past_question = create_question(question_text="Past Question.", pub_days=-5)
         url = reverse("polls:detail", args=(past_question.id,))
         response = self.client.get(url)
         self.assertContains(response, past_question.question_text)
@@ -201,10 +201,21 @@ class QuestionDetailViewTests(TestCase):
         The detail view of a question with an end_date in the past
         should redirect to polls index page.
         """
-        after_end_date = create_question_with_end_date(question_text="Past Question.", pub_days=-10, end_days=-5)
+        after_end_date = create_question(question_text="Past Question.", pub_days=-10, end_days=-5)
         url = reverse("polls:detail", args=(after_end_date.id,))
         response = self.client.get(url)
         self.assertRedirects(response, reverse("polls:index"))
+
+    def test_redirect_to_result_page_after_vote(self):
+        """
+        The detail view should redirect to result view when
+        user vote.
+        """
+        question = create_question('question', num_choice=1)
+        choice = question.choice_set.all()[0]
+        vote_url = reverse("polls:vote", args=(question.id,))
+        response = self.client.post(vote_url, {'choice': choice.id})
+        self.assertEqual(response.status_code, 302)
 
 
 class QuestionResultsViewTests(TestCase):
@@ -213,7 +224,7 @@ class QuestionResultsViewTests(TestCase):
         The results view of a question with a pub_date in the future
         returns a 404 not found.
         """
-        future_question = create_question(question_text="Future question.", days=5)
+        future_question = create_question(question_text="Future question.", pub_days=5)
         url = reverse("polls:results", args=(future_question.id,))
         response = self.client.get(url)
         self.assertEqual(response.status_code, 404)
@@ -223,7 +234,109 @@ class QuestionResultsViewTests(TestCase):
         The results view of a question with a pub_date in the past
         displays the question's text.
         """
-        past_question = create_question(question_text="Past Question.", days=-5)
+        past_question = create_question(question_text="Past Question.", pub_days=-5)
         url = reverse("polls:results", args=(past_question.id,))
         response = self.client.get(url)
         self.assertContains(response, past_question.question_text)
+
+
+class UserAuthTest(TestCase):
+    """Tests of user authentication."""
+    def setUp(self):
+        # superclass setUp creates a Client object and initializes test database
+        super().setUp()
+        self.username = "testuser"
+        self.password = "FatChance!"
+        self.user1 = User.objects.create_user(
+            username=self.username,
+            password=self.password,
+            email="testuser@nowhere.com"
+        )
+        self.user1.first_name = "Tester"
+        self.user1.save()
+        # we need a poll question to test voting
+        q = Question.objects.create(question_text="First Poll Question")
+        q.save()
+        # a few choices
+        for n in range(1, 4):
+            choice = Choice(choice_text=f"Choice {n}", question=q)
+            choice.save()
+        self.question = q
+
+    def vote(self, question: Question, choice: Choice):
+        vote_url = reverse("polls:vote", args=(question.id,))
+        response = self.client.post(vote_url, {'choice': choice.id})
+        return response
+
+    def test_logout(self):
+        """A user can logout using the logout url.
+
+        As an authenticated user,
+        when I visit /accounts/logout/
+        then I am logged out
+        and then redirected to the login page.
+        """
+        logout_url = reverse("logout")
+        # Authenticate the user.
+        # We want to logout this user, so we need to associate the
+        # user user with a session.  Setting client.user = ... doesn't work.
+        # Use Client.login(username, password) to do that.
+        # Client.login returns true on success
+        self.assertTrue(
+            self.client.login(username=self.username, password=self.password)
+        )
+        # visit the logout page
+        form_data = {}
+        response = self.client.post(logout_url, form_data)
+        self.assertEqual(302, response.status_code)
+
+        self.assertRedirects(response, reverse(settings.LOGOUT_REDIRECT_URL))
+
+    def test_login_view(self):
+        """A user can login using the login view."""
+        login_url = reverse("login")
+        # Can get the login page
+        response = self.client.get(login_url)
+        self.assertEqual(200, response.status_code)
+        # Can login using a POST request
+        # usage: client.post(url, {'key1":"value", "key2":"value"})
+        form_data = {"username": "testuser",
+                     "password": "FatChance!"
+                     }
+        response = self.client.post(login_url, form_data)
+        # after successful login, should redirect browser somewhere
+        self.assertEqual(302, response.status_code)
+        # should redirect us to the polls index page ("polls:index")
+        self.assertRedirects(response, reverse(settings.LOGIN_REDIRECT_URL))
+
+    def test_one_user_one_vote(self):
+        """
+        An authenticated user gets only 1 vote per poll.
+        A user can change his vote on a poll during the voting period
+        and his new vote replaces his old vote.
+        """
+        # User login
+        user = self.user1
+        self.client.force_login(user)
+
+        # Create question
+        question = create_question(question_text="question", num_choice=2)
+        choice1 = question.choice_set.all()[0]
+        choice2 = question.choice_set.all()[1]
+        self.assertEqual(choice1.votes, 0)
+        self.assertEqual(choice2.votes, 0)
+
+        # Vote Choice1
+        self.vote(question, choice1)
+        self.assertEqual(choice1.votes, 1)
+        self.assertEqual(choice2.votes, 0)
+
+        # Vote Choice1 again
+        self.vote(question, choice1)
+        self.assertEqual(choice1.votes, 1)
+        self.assertEqual(choice2.votes, 0)
+
+        # Vote Choice2
+        self.vote(question, choice2)
+        self.assertEqual(choice1.votes, 0)
+        self.assertEqual(choice2.votes, 1)
