@@ -1,8 +1,9 @@
-{% load static %}
+{% extends 'base.html' %}
 
-<link rel="stylesheet" href="{% static 'polls/style.css' %}">
 
+{% block content %}
 <h1>{{ "KU Polls" }}</h1>
+
 
 {% if messages %}
 <ul class="messages">
@@ -31,3 +32,4 @@
 {% else %}
     <p>No polls are available.</p>
 {% endif %}
+{% endblock content %}
