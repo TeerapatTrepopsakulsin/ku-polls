@@ -15,7 +15,7 @@ class Question(models.Model):
     pub_date = models.DateTimeField(verbose_name='date published',
                                     default=timezone.now)
     end_date = models.DateTimeField(verbose_name='ended date',
-                                    blank=True, null=True)
+                                    blank=True, null=True, default=None)
 
     def __str__(self):
         return self.question_text
