@@ -1,4 +1,5 @@
 # KU Polls: Online Survey Questions 
+[![flake8-linting](https://github.com/TeerapatTrepopsakulsin/ku-polls/actions/workflows/flake8-linting.yml/badge.svg)](https://github.com/TeerapatTrepopsakulsin/ku-polls/actions/workflows/flake8-linting.yml)
 
 An application to conduct online polls and surveys based
 on the [Django Tutorial project](https://docs.djangoproject.com/en/5.1/intro/), with
