@@ -28,6 +28,19 @@ jobs:
         python -m pip install --upgrade pip
         pip install pytest
         if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+    - name: Setup Environment
+      env:
+        SECRET_KEY: ${{ secrets.SECRET_KEY }}
+        DEBUG: False
+        ALLOWED_HOSTS: localhost,127.0.0.1
+        TIME_ZONE: Asia/Bangkok
+      run: |
+        touch .env
+        echo SECRET_KEY=${SECRET_KEY} >> .env
+        echo DEBUG=${DEBUG} >> .env
+        echo ALLOWED_HOSTS=${ALLOWED_HOSTS} >> .env
+        echo TIME_ZONE=${TIME_ZONE} >> .env
+        cat .env
     - name: Test with pytest
       run: |
         pytest
