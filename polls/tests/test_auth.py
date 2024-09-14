@@ -1,3 +1,4 @@
+"""Unittests for authenticated user behavior."""
 import datetime
 
 from django.test import TestCase
@@ -11,6 +12,8 @@ from polls.models import Question, Choice
 
 def create_question(question_text, pub_days=0, end_days=None, num_choice=0):
     """
+    Create question object.
+
     Create a question with the given `question_text`, published the
     given number of `pub_days`, and ended the
     given number of `end_days` offset to now (negative for questions published
@@ -22,7 +25,8 @@ def create_question(question_text, pub_days=0, end_days=None, num_choice=0):
         end_time = timezone.now() + datetime.timedelta(days=end_days)
     except TypeError:
         end_time = None
-    question = Question.objects.create(question_text=question_text, pub_date=pub_time, end_date=end_time)
+    question = Question.objects.create(question_text=question_text,
+                                       pub_date=pub_time, end_date=end_time)
     for i in range(num_choice):
         question.choice_set.create(choice_text=str(i))
     return question
@@ -30,8 +34,11 @@ def create_question(question_text, pub_days=0, end_days=None, num_choice=0):
 
 class UserAuthTest(TestCase):
     """Tests of user authentication."""
+
     def setUp(self):
-        # superclass setUp creates a Client object and initializes test database
+        """Set up the elements for authentication."""
+        # superclass setUp creates a Client object
+        # and initializes test database
         super().setUp()
         self.username = "testuser"
         self.password = "FatChance!"
@@ -52,6 +59,7 @@ class UserAuthTest(TestCase):
         self.question = q
 
     def vote(self, question: Question, choice: Choice):
+        """Return user response of voting choice in the question."""
         vote_url = reverse("polls:vote", args=(question.id,))
         response = self.client.post(vote_url, {'choice': choice.id})
         return response
@@ -100,6 +108,7 @@ class UserAuthTest(TestCase):
     def test_one_user_one_vote(self):
         """
         An authenticated user gets only 1 vote per poll.
+
         A user can change his vote on a poll during the voting period
         and his new vote replaces his old vote.
         """

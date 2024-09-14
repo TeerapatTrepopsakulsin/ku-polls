@@ -1,7 +1,11 @@
 li a {
-    color: white;
+    color: black;
 }
 body {
     background: white url("images/background.png") no-repeat;
     background-size: cover;
+}
+.white-box {
+    background-color: white;
+    padding: 20px;
 }

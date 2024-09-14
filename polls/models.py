@@ -1,4 +1,4 @@
-"""The models module which contains elements in the polls app"""
+"""The models module which contains elements in the polls app."""
 import datetime
 
 from django.db import models
@@ -9,20 +9,24 @@ from django.contrib.auth.models import User
 class Question(models.Model):
     """
     A class used to represent a polls question within the app.
+
     Will contain different elements inside depends on the question type.
     """
+
     question_text = models.CharField(max_length=200)
     pub_date = models.DateTimeField(verbose_name='date published',
                                     default=timezone.now)
     end_date = models.DateTimeField(verbose_name='ended date',
-                                    blank=True, null=True)
+                                    blank=True, null=True, default=None)
 
     def __str__(self):
+        """Return question text."""
         return self.question_text
 
     def was_published_recently(self):
         """
-        Check whether the question is published within a day
+        Check whether the question is published within a day.
+
         :return: bool
         """
         now = timezone.now()
@@ -30,8 +34,8 @@ class Question(models.Model):
 
     def is_published(self):
         """
-        Check whether the current date-time is on or after
-        question’s publication date.
+        Check if the current time is on or after question’s pub_date.
+
         :return: bool
         """
         now = timezone.now()
@@ -40,9 +44,11 @@ class Question(models.Model):
     def can_vote(self):
         """
         Check whether the voting is allowed for this specific question.
+
         Voting is available when the current time
         is between the pub_date and end_date.
         If end_date is None, then can vote anytime after published.
+
         :return: bool
         """
         now = timezone.now()
@@ -54,6 +60,7 @@ class Question(models.Model):
 class Choice(models.Model):
     """
     A class used to represent an individual choice in the polls question.
+
     Mostly used for a multiple choices polls question.
     """
 
@@ -66,6 +73,7 @@ class Choice(models.Model):
         return self.vote_set.count()
 
     def __str__(self):
+        """Return choice text."""
         return self.choice_text
 
 
@@ -76,4 +84,5 @@ class Vote(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
 
     def __str__(self):
+        """Return string contains user and choice selected by the user."""
         return f"Vote: {self.user} -> {self.choice}"

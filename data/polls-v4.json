@@ -1,0 +1,344 @@
+[
+{
+  "model": "polls.question",
+  "pk": 3,
+  "fields": {
+    "question_text": "Are zoos considered animal abuse?",
+    "pub_date": "2024-08-31T10:34:26.506Z",
+    "end_date": null
+  }
+},
+{
+  "model": "polls.question",
+  "pk": 4,
+  "fields": {
+    "question_text": "How many holes does a straw have?",
+    "pub_date": "2024-08-31T10:59:48.009Z",
+    "end_date": null
+  }
+},
+{
+  "model": "polls.question",
+  "pk": 5,
+  "fields": {
+    "question_text": "Should breakdancing still be included in the Olympics?",
+    "pub_date": "2024-08-31T11:02:17.433Z",
+    "end_date": null
+  }
+},
+{
+  "model": "polls.question",
+  "pk": 8,
+  "fields": {
+    "question_text": "Who should be the next Czechia president?",
+    "pub_date": "2024-09-01T12:43:37.582Z",
+    "end_date": "2024-09-01T12:43:37.582Z"
+  }
+},
+{
+  "model": "polls.question",
+  "pk": 9,
+  "fields": {
+    "question_text": "What age is appropriate for children to own a phone?",
+    "pub_date": "2024-09-12T14:01:23.255Z",
+    "end_date": null
+  }
+},
+{
+  "model": "polls.question",
+  "pk": 10,
+  "fields": {
+    "question_text": "How many hours per week should people exercise?",
+    "pub_date": "2024-09-14T05:00:59.392Z",
+    "end_date": null
+  }
+},
+{
+  "model": "polls.choice",
+  "pk": 16,
+  "fields": {
+    "question": 3,
+    "choice_text": "Yes"
+  }
+},
+{
+  "model": "polls.choice",
+  "pk": 17,
+  "fields": {
+    "question": 3,
+    "choice_text": "Probably"
+  }
+},
+{
+  "model": "polls.choice",
+  "pk": 18,
+  "fields": {
+    "question": 3,
+    "choice_text": "Probably not"
+  }
+},
+{
+  "model": "polls.choice",
+  "pk": 19,
+  "fields": {
+    "question": 3,
+    "choice_text": "No"
+  }
+},
+{
+  "model": "polls.choice",
+  "pk": 20,
+  "fields": {
+    "question": 4,
+    "choice_text": "No holes"
+  }
+},
+{
+  "model": "polls.choice",
+  "pk": 21,
+  "fields": {
+    "question": 4,
+    "choice_text": "1 hole"
+  }
+},
+{
+  "model": "polls.choice",
+  "pk": 22,
+  "fields": {
+    "question": 4,
+    "choice_text": "2 holes"
+  }
+},
+{
+  "model": "polls.choice",
+  "pk": 23,
+  "fields": {
+    "question": 4,
+    "choice_text": "Uncertain"
+  }
+},
+{
+  "model": "polls.choice",
+  "pk": 24,
+  "fields": {
+    "question": 5,
+    "choice_text": "Yes"
+  }
+},
+{
+  "model": "polls.choice",
+  "pk": 25,
+  "fields": {
+    "question": 5,
+    "choice_text": "No"
+  }
+},
+{
+  "model": "polls.choice",
+  "pk": 26,
+  "fields": {
+    "question": 5,
+    "choice_text": "I don't know"
+  }
+},
+{
+  "model": "polls.choice",
+  "pk": 34,
+  "fields": {
+    "question": 8,
+    "choice_text": "Petr Pavel"
+  }
+},
+{
+  "model": "polls.choice",
+  "pk": 35,
+  "fields": {
+    "question": 8,
+    "choice_text": "Karel Divis"
+  }
+},
+{
+  "model": "polls.choice",
+  "pk": 36,
+  "fields": {
+    "question": 8,
+    "choice_text": "Danuse Nerudova"
+  }
+},
+{
+  "model": "polls.choice",
+  "pk": 37,
+  "fields": {
+    "question": 8,
+    "choice_text": "None of the above"
+  }
+},
+{
+  "model": "polls.choice",
+  "pk": 38,
+  "fields": {
+    "question": 9,
+    "choice_text": "0-4"
+  }
+},
+{
+  "model": "polls.choice",
+  "pk": 39,
+  "fields": {
+    "question": 9,
+    "choice_text": "5"
+  }
+},
+{
+  "model": "polls.choice",
+  "pk": 40,
+  "fields": {
+    "question": 9,
+    "choice_text": "6"
+  }
+},
+{
+  "model": "polls.choice",
+  "pk": 41,
+  "fields": {
+    "question": 9,
+    "choice_text": "7"
+  }
+},
+{
+  "model": "polls.choice",
+  "pk": 42,
+  "fields": {
+    "question": 9,
+    "choice_text": "8"
+  }
+},
+{
+  "model": "polls.choice",
+  "pk": 43,
+  "fields": {
+    "question": 9,
+    "choice_text": "9"
+  }
+},
+{
+  "model": "polls.choice",
+  "pk": 44,
+  "fields": {
+    "question": 9,
+    "choice_text": "10"
+  }
+},
+{
+  "model": "polls.choice",
+  "pk": 45,
+  "fields": {
+    "question": 9,
+    "choice_text": "11"
+  }
+},
+{
+  "model": "polls.choice",
+  "pk": 46,
+  "fields": {
+    "question": 9,
+    "choice_text": "12"
+  }
+},
+{
+  "model": "polls.choice",
+  "pk": 47,
+  "fields": {
+    "question": 9,
+    "choice_text": "13"
+  }
+},
+{
+  "model": "polls.choice",
+  "pk": 48,
+  "fields": {
+    "question": 9,
+    "choice_text": "14"
+  }
+},
+{
+  "model": "polls.choice",
+  "pk": 49,
+  "fields": {
+    "question": 9,
+    "choice_text": "15"
+  }
+},
+{
+  "model": "polls.choice",
+  "pk": 50,
+  "fields": {
+    "question": 9,
+    "choice_text": "16"
+  }
+},
+{
+  "model": "polls.choice",
+  "pk": 51,
+  "fields": {
+    "question": 9,
+    "choice_text": "17"
+  }
+},
+{
+  "model": "polls.choice",
+  "pk": 52,
+  "fields": {
+    "question": 9,
+    "choice_text": "18+"
+  }
+},
+{
+  "model": "polls.choice",
+  "pk": 53,
+  "fields": {
+    "question": 10,
+    "choice_text": "Shouldn't exercise"
+  }
+},
+{
+  "model": "polls.choice",
+  "pk": 54,
+  "fields": {
+    "question": 10,
+    "choice_text": "1-2 hours"
+  }
+},
+{
+  "model": "polls.choice",
+  "pk": 55,
+  "fields": {
+    "question": 10,
+    "choice_text": "3-4 hours"
+  }
+},
+{
+  "model": "polls.choice",
+  "pk": 56,
+  "fields": {
+    "question": 10,
+    "choice_text": "5-6 hours"
+  }
+},
+{
+  "model": "polls.choice",
+  "pk": 57,
+  "fields": {
+    "question": 10,
+    "choice_text": "7-8 hours"
+  }
+},
+{
+  "model": "polls.choice",
+  "pk": 58,
+  "fields": {
+    "question": 10,
+    "choice_text": "9+ hours"
+  }
+}
+]
