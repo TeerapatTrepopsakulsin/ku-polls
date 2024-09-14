@@ -1,5 +1,4 @@
 # KU Polls: Online Survey Questions 
-[![flake8-linting](https://github.com/TeerapatTrepopsakulsin/ku-polls/actions/workflows/flake8-linting.yml/badge.svg)](https://github.com/TeerapatTrepopsakulsin/ku-polls/actions/workflows/flake8-linting.yml)
 [![unittest-results](https://github.com/TeerapatTrepopsakulsin/ku-polls/actions/workflows/unittest.yml/badge.svg)](https://github.com/TeerapatTrepopsakulsin/ku-polls/actions/workflows/unittest.yml)
 
 An application to conduct online polls and surveys based
