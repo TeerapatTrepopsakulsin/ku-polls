@@ -26,16 +26,8 @@ jobs:
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
-        pip install pytest
         if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
-    - name: Setup Environment
+        /bin/cp sample.env .env
+    - name: Run Tests
       run: |
-        touch .env
-        echo SECRET_KEY=${{ secrets.SECRET_KEY }} >> .env
-        echo DEBUG=false >> .env
-        echo ALLOWED_HOSTS=localhost,127.0.0.1 >> .env
-        echo TIME_ZONE=Asia/Bangkok >> .env
-        cat .env
-    - name: Test with pytest
-      run: |
-        pytest
+        python manage.py test
