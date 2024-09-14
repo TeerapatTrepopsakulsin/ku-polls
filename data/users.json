@@ -76,7 +76,7 @@
   "pk": 8,
   "fields": {
     "password": "pbkdf2_sha256$870000$6rsS5Mi33lQHzXp5b6LIWY$QJ+Llv41nDhOFROsqLQNdote7SUwPFlisW6I9lADGFk=",
-    "last_login": "2024-09-07T08:04:23.470Z",
+    "last_login": "2024-09-09T03:19:09.574Z",
     "is_superuser": false,
     "username": "demo3",
     "first_name": "demo3",
