@@ -45,8 +45,19 @@ Once done, do the following in the directory where you placed the project files.
     python -m pip install -r requirements.txt
     ```
 
-5. In the project root directory, copy ```sample.env``` to ```.env``` (file name begins with "."). Then edit ```.env``` and set values of these variables as desired.     
-Some recommendations are already included in the ```sample.env```.   
+5. In the project root directory, copy ```sample.env``` to ```.env``` (file name begins with ".").    
+   Then edit ```.env``` and set values of these variables as desired.     
+Some recommendations are already included in the ```sample.env```.
+
+    - How to copy `sample.env` to `.env`:
+      > Linux and MacOS:
+      ```
+       cp sample.env .env
+      ```
+      > MS Windows:
+      ```
+       copy sample.env .env
+      ```
  
     - This is example ```.env```
 
