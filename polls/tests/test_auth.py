@@ -105,6 +105,25 @@ class UserAuthTest(TestCase):
         # should redirect us to the polls index page ("polls:index")
         self.assertRedirects(response, reverse(settings.LOGIN_REDIRECT_URL))
 
+    def test_user_get_detail_question(self):
+        """
+        Tests user get detail page response for question.
+
+        The detail view of a question with a pub_date in the past
+        displays the question's text if user is authenticated.
+        """
+        # User login
+        user = self.user1
+        self.client.force_login(user)
+
+        # Create question
+        past_question = create_question(question_text="Past Question.")
+
+        url = reverse("polls:detail", args=(past_question.id,))
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, past_question.question_text)
+
     def test_one_user_one_vote(self):
         """
         An authenticated user gets only 1 vote per poll.
