@@ -1,6 +1,6 @@
 """KU Polls app UI."""
 from django.http import HttpResponseRedirect
-from django.shortcuts import get_object_or_404, render, redirect
+from django.shortcuts import get_object_or_404, redirect
 from django.urls import reverse
 from django.views import generic
 from django.utils import timezone
@@ -116,7 +116,6 @@ class DetailView(generic.DetailView):
         else:
             messages.error(request, 'Please log in first!')
         return redirect('polls:index')
-
 
 
 class ResultsView(generic.DetailView):
