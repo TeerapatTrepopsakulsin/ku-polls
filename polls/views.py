@@ -94,25 +94,29 @@ class DetailView(generic.DetailView):
 
     def get(self, request, *args, **kwargs):
         """Render the poll detail page."""
-        try:
-            question = Question.objects.get(pk=self.kwargs['pk'])
-        except Question.DoesNotExist:
-            messages.error(request, 'The poll does not exist.')
-            return redirect('polls:index')
-        if question.can_vote():
+        if self.request.user.is_authenticated:
             try:
-                current_user = request.user
-                vote = Vote.objects.get(user=current_user,
-                                        choice__question=question)
-            except Vote.DoesNotExist:
-                pass
-            else:
-                messages.info(request=request,
-                              message=f"Your current choice is '{vote.choice}'")
-            finally:
-                return super().get(request, *args, **kwargs)
-        messages.error(request, 'Voting is not available for the poll.')
+                question = Question.objects.get(pk=self.kwargs['pk'])
+            except Question.DoesNotExist:
+                messages.error(request, 'The poll does not exist.')
+                return redirect('polls:index')
+            if question.can_vote():
+                try:
+                    current_user = request.user
+                    vote = Vote.objects.get(user=current_user,
+                                            choice__question=question)
+                except Vote.DoesNotExist:
+                    pass
+                else:
+                    messages.info(request=request,
+                                  message=f"Your current choice is '{vote.choice}'")
+                finally:
+                    return super().get(request, *args, **kwargs)
+            messages.error(request, 'Voting is not available for the poll.')
+        else:
+            messages.error(request, 'Please log in first!')
         return redirect('polls:index')
+
 
 
 class ResultsView(generic.DetailView):
