@@ -78,11 +78,24 @@ class DetailView(generic.DetailView):
         """Excludes any questions that aren't published yet."""
         return Question.objects.filter(pub_date__lte=timezone.now())
 
-    @staticmethod
-    def render(request, pk, *args, **kwargs):
+    def get_context_data(self, **kwargs):
+        """Get user current vote choice into the context."""
+        context = super().get_context_data(**kwargs)
+        question = self.get_object()
+        cur_user = self.request.user
+        try:
+            cur_vote = Vote.objects.get(user=cur_user,
+                                        choice__question=question)
+        except Vote.DoesNotExist:
+            context['cur_choice'] = None
+        else:
+            context['cur_choice'] = cur_vote.choice
+        return context
+
+    def get(self, request, *args, **kwargs):
         """Render the poll detail page."""
         try:
-            question = Question.objects.get(pk=pk)
+            question = Question.objects.get(pk=self.kwargs['pk'])
         except Question.DoesNotExist:
             messages.error(request, 'The poll does not exist.')
             return redirect('polls:index')
@@ -97,8 +110,7 @@ class DetailView(generic.DetailView):
                 messages.info(request=request,
                               message=f"Your current choice is '{vote.choice}'")
             finally:
-                return render(request, "polls/detail.html",
-                              {"question": question})
+                return super().get(request, *args, **kwargs)
         messages.error(request, 'Voting is not available for the poll.')
         return redirect('polls:index')
 
