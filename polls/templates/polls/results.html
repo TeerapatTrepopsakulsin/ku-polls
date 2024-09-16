@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<h1>{{ question.question_text }}</h1>
+<h1 class="white-box">{{ question.question_text }}</h1>
 
 {% if messages %}
 <ul class="messages">
@@ -26,5 +26,5 @@
 </table>
 
 <br>
-<a href="{% url 'polls:index'%}">Back to List of Polls</a>
+<a href="{% url 'polls:index'%}"><button class="button">Back to List of Polls</button></a>
 {% endblock content %}

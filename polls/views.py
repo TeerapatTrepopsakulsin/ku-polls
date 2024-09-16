@@ -1,6 +1,6 @@
 """KU Polls app UI."""
 from django.http import HttpResponseRedirect
-from django.shortcuts import get_object_or_404, render, redirect
+from django.shortcuts import get_object_or_404, redirect
 from django.urls import reverse
 from django.views import generic
 from django.utils import timezone
@@ -78,28 +78,43 @@ class DetailView(generic.DetailView):
         """Excludes any questions that aren't published yet."""
         return Question.objects.filter(pub_date__lte=timezone.now())
 
-    @staticmethod
-    def render(request, pk, *args, **kwargs):
-        """Render the poll detail page."""
+    def get_context_data(self, **kwargs):
+        """Get user current vote choice into the context."""
+        context = super().get_context_data(**kwargs)
+        question = self.get_object()
+        cur_user = self.request.user
         try:
-            question = Question.objects.get(pk=pk)
-        except Question.DoesNotExist:
-            messages.error(request, 'The poll does not exist.')
-            return redirect('polls:index')
-        if question.can_vote():
-            try:
-                current_user = request.user
-                vote = Vote.objects.get(user=current_user,
+            cur_vote = Vote.objects.get(user=cur_user,
                                         choice__question=question)
-            except Vote.DoesNotExist:
-                pass
-            else:
-                messages.info(request=request,
-                              message=f"Your current choice is '{vote.choice}'")
-            finally:
-                return render(request, "polls/detail.html",
-                              {"question": question})
-        messages.error(request, 'Voting is not available for the poll.')
+        except Vote.DoesNotExist:
+            context['cur_choice'] = None
+        else:
+            context['cur_choice'] = cur_vote.choice
+        return context
+
+    def get(self, request, *args, **kwargs):
+        """Render the poll detail page."""
+        if self.request.user.is_authenticated:
+            try:
+                question = Question.objects.get(pk=self.kwargs['pk'])
+            except Question.DoesNotExist:
+                messages.error(request, 'The poll does not exist.')
+                return redirect('polls:index')
+            if question.can_vote():
+                try:
+                    current_user = request.user
+                    vote = Vote.objects.get(user=current_user,
+                                            choice__question=question)
+                except Vote.DoesNotExist:
+                    pass
+                else:
+                    messages.info(request=request,
+                                  message=f"Your current choice is '{vote.choice}'")
+                finally:
+                    return super().get(request, *args, **kwargs)
+            messages.error(request, 'Voting is not available for the poll.')
+        else:
+            messages.error(request, 'Please log in first!')
         return redirect('polls:index')
 
 

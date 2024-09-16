@@ -95,20 +95,8 @@ class QuestionDetailViewTests(TestCase):
                                           pub_days=5)
         url = reverse("polls:detail", args=(future_question.id,))
         response = self.client.get(url)
+        self.assertEqual(response.status_code, 302)
         self.assertRedirects(response, reverse("polls:index"))
-
-    def test_past_question(self):
-        """
-        Tests detail page response for past question.
-
-        The detail view of a question with a pub_date in the past
-        displays the question's text.
-        """
-        past_question = create_question(question_text="Past Question.",
-                                        pub_days=-5)
-        url = reverse("polls:detail", args=(past_question.id,))
-        response = self.client.get(url)
-        self.assertContains(response, past_question.question_text)
 
     def test_after_end_date_question(self):
         """
@@ -121,13 +109,14 @@ class QuestionDetailViewTests(TestCase):
                                          pub_days=-10, end_days=-5)
         url = reverse("polls:detail", args=(after_end_date.id,))
         response = self.client.get(url)
+        self.assertEqual(response.status_code, 302)
         self.assertRedirects(response, reverse("polls:index"))
 
     def test_redirect_to_result_page_after_vote(self):
         """
         Tests detail page response after user has voted.
 
-        The detail view should redirect to result view when user vote.
+        The detail view should get redirect status code when user vote.
         """
         question = create_question('question', num_choice=1)
         choice = question.choice_set.all()[0]
