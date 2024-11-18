@@ -57,11 +57,11 @@ class Question(models.Model):
         return self.is_published()
 
     def cur_user_voted(self, user):
-        return Vote.objects.filter(user=user, choice__question=self).exists()
+        return Vote.objects.filter(user=user.id, choice__question=self).exists()
 
     def cur_user_choice(self, user):
         try:
-            return Vote.objects.filter(user=user, choice__question=self)[0].choice
+            return Vote.objects.filter(user=user.id, choice__question=self)[0].choice
         except IndexError:
             return None
 
