@@ -67,6 +67,15 @@ class IndexView(generic.ListView):
         """Return the published questions."""
         return Question.objects.filter(pub_date__lte=timezone.now()).order_by("-pub_date")
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        cur_user = self.request.user
+        latest_question_list = context["latest_question_list"]
+        for question in latest_question_list:
+            question.user_voted = question.cur_user_voted(cur_user)
+            question.user_choice = question.cur_user_choice(cur_user)
+        return context
+
 
 class DetailView(generic.DetailView):
     """Display the choices of the polls to vote."""
@@ -167,4 +176,26 @@ def vote(request, question_id):
                 f'vote for choice:{selected_choice.id} '
                 f'in question:{selected_choice.question.id}')
     return HttpResponseRedirect(reverse("polls:results",
+                                        args=(question.id,)))
+
+
+@login_required
+def clear(request, question_id):
+    question = get_object_or_404(Question, pk=question_id)
+    current_user = request.user
+
+    try:
+        vote = Vote.objects.get(user=current_user, choice__question=question)
+        # user have vote for this question
+        vote.delete()
+        messages.success(request=request,
+                         message=f"Your vote has been cleared.")
+
+        logger.info(f'user:{current_user.username} '
+                    f'clear vote for choice:{vote.choice.id} '
+                    f'in question:{question.id}')
+    except Vote.DoesNotExist:
+        messages.error(request=request, message=f"You haven't vote.")
+
+    return HttpResponseRedirect(reverse("polls:detail",
                                         args=(question.id,)))

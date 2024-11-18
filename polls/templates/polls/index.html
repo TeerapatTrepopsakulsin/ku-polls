@@ -49,9 +49,14 @@
             {% else %}
                 <span class="status-closed">Closed</span>
             {% endif %}
+
             <a href="{% url 'polls:results' question.id %}">
                 <button class="button">See Result</button>
             </a>
+
+            {% if question.user_voted %}
+            Your current vote: {{ question.user_choice }}
+            {% endif %}
         </li>
     {% endfor %}
 </ul>

@@ -56,6 +56,15 @@ class Question(models.Model):
             return self.is_published() and now <= self.end_date
         return self.is_published()
 
+    def cur_user_voted(self, user):
+        return Vote.objects.filter(user=user, choice__question=self).exists()
+
+    def cur_user_choice(self, user):
+        try:
+            return Vote.objects.filter(user=user, choice__question=self)[0].choice
+        except IndexError:
+            return None
+
 
 class Choice(models.Model):
     """
@@ -85,4 +94,4 @@ class Vote(models.Model):
 
     def __str__(self):
         """Return string contains user and choice selected by the user."""
-        return f"Vote: {self.user} -> {self.choice}"
+        return f"{self.user} -> {self.choice}"

@@ -3,7 +3,7 @@
 {% load static %}
 <link rel="stylesheet" href="{% static 'polls/style.css' %}">
     <head>
-        <title>KU Polls</title>
+        <title>{% block title %} {% endblock %}</title>
     </head>
     {% if user.is_authenticated %}
     Hi! {{user.username}}.
