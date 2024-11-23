@@ -1,0 +1,6 @@
+../htmlcov
+.coverage
+.env
+db.sqlite3
+general.log
+Dockerfile
